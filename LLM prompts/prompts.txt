@@ -1,0 +1,9 @@
+## Prompts used to generate the code
+
+Generate python code flask, d3 js, html, css code for stock dashboard application with following features: 
+1. create a comparison chart given a list of comma separated stock symbols, 
+2. add a table to show the important measurements like market cap, pe, price to book, etc on the page. 
+3. Use d3 js, flask, python, yahoo finance api, thin colorful d3 js comparison charts. 
+4. make tooltip on the comparison chart like a bubble and include symbol name and price information in the tooltip bubble.
+5. also when I hover over the line chart or table row, highlight the correspodning stock line in the chart or row in the table
+
