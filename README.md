@@ -7,8 +7,16 @@ I have generated Stock price comparison dashboard application.
 
 ## Running the application 
 
+Please follow the steps to run on your local machine. Python version used for the application is 3.9. Best practice is to create a virtual environment. Alos, IDE to go with is Pycharm community version, if you want to give it a try.:
+ 
+ 1. Make sure to install python 3.9. It should work on latest versions of Python as well, but not tested. 
+ 2. Install dependencies using: pip install -r requirements.txt 
+ 2. python.exe .\run.py
+
 
 ## Screenshots
+
+![Alt text](app_home_page.png?raw=true "Stock Dashboard App")
 
 
 ## Key Takeaways
