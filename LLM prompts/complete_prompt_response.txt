@@ -1,0 +1,515 @@
+Below is a full example of a stock dashboard application using Flask, D3.js, and Yahoo Finance API. This application includes the comparison chart, a table with key metrics, and interactive features like tooltips and highlights.
+
+### Project Structure
+
+```
+stock_dashboard/
+│
+├── app/
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── styles.css
+│   │   └── js/
+│   │       └── scripts.js
+│   ├── templates/
+│   │   └── index.html
+│   ├── Dockerfile
+│   ├── helm/
+│   │   ├── Chart.yaml
+│   │   └── templates/
+│   │       ├── deployment.yaml
+│   │       └── service.yaml
+│   └── requirements.txt
+│
+├── run.py
+├── .env
+└── README.md
+```
+
+### 1. Flask Application Setup
+
+#### `app/__init__.py`
+
+```python
+from flask import Flask
+
+def create_app():
+    app = Flask(__name__)
+    
+    from .routes import routes
+    app.register_blueprint(routes)
+
+    return app
+```
+
+#### `app/routes.py`
+
+```python
+from flask import Blueprint, render_template, request, jsonify
+import yfinance as yf
+
+routes = Blueprint('routes', __name__)
+
+@routes.route('/')
+def index():
+    return render_template('index.html')
+
+@routes.route('/get_stock_data', methods=['POST'])
+def get_stock_data():
+    companies = request.form.get('companies').split(',')
+    start_date = request.form.get('start-date')
+    end_date = request.form.get('end-date')
+    data = {'stocks': [], 'metrics': []}
+    for company in companies:
+        ticker = yf.Ticker(company.strip())
+        hist = ticker.history(start=start_date, end=end_date)
+        hist['Symbol'] = company.strip()
+        data['stocks'].extend(hist.reset_index().to_dict(orient='records'))
+        metrics = {
+            'symbol': company.strip(),
+            'market_cap': ticker.info.get('marketCap'),
+            'pe_ratio': ticker.info.get('trailingPE'),
+            'price_to_book': ticker.info.get('priceToBook'),
+            'industry': ticker.info.get('industry'),
+            'sector': ticker.info.get('sector')
+        }
+        data['metrics'].append(metrics)
+    return jsonify(data)
+```
+
+#### `run.py`
+
+```python
+from app import create_app
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load environment variables from .env file
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=os.getenv('FLASK_ENV') == 'development', host='0.0.0.0', port=5000)
+```
+
+### 2. HTML, CSS, and JavaScript
+
+#### `app/templates/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+    <h1>Stock Dashboard</h1>
+    <form id="stock-form">
+        <div class="form-group">
+            <input type="text" name="companies" placeholder="Enter comma-separated stock symbols">
+        </div>
+        <div class="form-group-row">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" name="start-date">
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" name="end-date">
+            <button type="submit"><i class="fa fa-search"></i>Search</button>
+        </div>
+    </form>
+    <div id="chart"></div>
+    <div id="metrics"></div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
+```
+
+#### `app/static/css/styles.css`
+
+```css
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 80%;
+}
+
+.form-group {
+    margin: 10px 0;
+}
+
+.form-group-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+input[type="date"] {
+    width: 150px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0 10px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+button .fa {
+    margin-right: 8px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#chart, #metrics {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+}
+
+#chart svg {
+    display: block;
+    margin: auto;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    pointer-events: none;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+```
+
+#### `app/static/js/scripts.js`
+
+```javascript
+document.getElementById('stock-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    formData.append('start-date', startDate);
+    formData.append('end-date', endDate);
+
+    fetch('/get_stock_data', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Data received:', data);
+        document.getElementById('chart').innerHTML = '';
+        document.getElementById('metrics').innerHTML = '';
+        createChart(data.stocks);
+        createMetricsTable(data.metrics);
+    });
+});
+
+function createChart(data) {
+    console.log('Creating chart with data:', data);
+
+    const svg = d3.select("#chart").append("svg").attr("width", 800).attr("height", 400),
+        margin = { top: 20, right: 30, bottom: 30, left: 40 },
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom,
+        g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const parseTime = d3.timeParse("%Y-%m-%d");
+
+    // Parse and clean the data
+    data.forEach(d => {
+        d.date = parseTime(d.Date);
+        d.close = parseFloat(d.Close);
+    });
+
+    const x = d3.scaleTime().range([0, width]),
+          y = d3.scaleLinear().range([height, 0]);
+
+    x.domain(d3.extent(data, d => d.date));
+    y.domain([0, d3.max(data, d => d.close)]);
+
+    const line = d3.line()
+        .x(d => x(d.date))
+        .y(d => y(d.close))
+        .curve(d3.curveMonotoneX);
+
+    const colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const nestedData = d3.groups(data, d => d.Symbol);
+
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    nestedData.forEach((symbolData, i) => {
+        const path = g.append("path")
+            .datum(symbolData[1])
+            .attr("fill", "none")
+            .attr("stroke", colors(i))
+            .attr("stroke-width", 1.5)
+            .attr("class", `line-${i}`)
+            .attr("d", line);
+
+        g.selectAll(`.dot-${i}`)
+            .data(symbolData[1])
+            .enter().append("circle")
+            .attr("r", 3)
+            .attr("cx", d =>
+
+It seems the previous response was cut off before completion. Let's continue from where it left off and ensure all the required code is included.
+
+### Continuation of `app/static/js/scripts.js`
+
+```javascript
+        g.selectAll(`.dot-${i}`)
+            .data(symbolData[1])
+            .enter().append("circle")
+            .attr("r", 3)
+            .attr("cx", d => x(d.date))
+            .attr("cy", d => y(d.close))
+            .attr("fill", colors(i))
+            .attr("class", `dot-${i}`)
+            .on("mouseover", function(event, d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(`Symbol: ${d.Symbol}<br>Date: ${d3.timeFormat("%Y-%m-%d")(d.date)}<br>Close: ${d.close}`)
+                    .style("left", (event.pageX + 5) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+                d3.select(this).attr("r", 6);
+                d3.select(`.line-${i}`).attr("stroke-width", 3);
+            })
+            .on("mouseout", function(event, d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+                d3.select(this).attr("r", 3);
+                d3.select(`.line-${i}`).attr("stroke-width", 1.5);
+            });
+    });
+
+    g.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("x", width / 2)
+        .attr("y", margin.bottom - 5)
+        .attr("text-anchor", "middle")
+        .text("Date");
+
+    g.append("g")
+        .call(d3.axisLeft(y))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left + 10)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("Close Price");
+}
+
+function createMetricsTable(metrics) {
+    const table = d3.select("#metrics").append("table"),
+          thead = table.append("thead"),
+          tbody = table.append("tbody");
+
+    const columns = ["symbol", "market_cap", "pe_ratio", "price_to_book", "industry", "sector"];
+
+    thead.append("tr")
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+        .text(d => d)
+        .on("click", function(event, d) {
+            const ascending = d3.select(this).classed("asc");
+            tbody.selectAll("tr")
+                .sort((a, b) => ascending
+                    ? d3.ascending(a[d], b[d])
+                    : d3.descending(a[d], b[d]));
+            d3.select(this).classed("asc", !ascending);
+        });
+
+    const rows = tbody.selectAll("tr")
+        .data(metrics)
+        .enter()
+        .append("tr")
+        .style("color", (d, i) => d3.schemeCategory10[i % 10])
+        .attr("class", (d, i) => `row-${i}`)
+        .on("mouseover", function(event, d, i) {
+            d3.select(`.line-${i}`).attr("stroke-width", 3);
+            d3.selectAll(`.dot-${i}`).attr("r", 6);
+        })
+        .on("mouseout", function(event, d, i) {
+            d3.select(`.line-${i}`).attr("stroke-width", 1.5);
+            d3.selectAll(`.dot-${i}`).attr("r", 3);
+        });
+
+    rows.selectAll("td")
+        .data(d => columns.map(column => d[column]))
+        .enter()
+        .append("td")
+        .text(d => d);
+}
+```
+
+### 3. Dockerfile
+
+#### `app/Dockerfile`
+
+```dockerfile
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
+
+# Define environment variable
+ENV FLASK_ENV=development
+
+# Run app.py when the container launches
+CMD ["python", "run.py"]
+```
+
+### 4. Helm Chart
+
+#### `app/helm/Chart.yaml`
+
+```yaml
+apiVersion: v2
+name: stock-dashboard
+description: A Helm chart for deploying the Stock Dashboard application
+type: application
+version: 0.1.0
+appVersion: "1.0"
+```
+
+#### `app/helm/templates/deployment.yaml`
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stock-dashboard
+  template:
+    metadata:
+      labels:
+        app: stock-dashboard
+    spec:
+      containers:
+      - name: stock-dashboard
+        image: your-docker-registry/stock-dashboard:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FLASK_ENV
+          value: "production"
+```
+
+#### `app/helm/templates/service.yaml`
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-dashboard
+spec:
+  selector:
+    app: stock-dashboard
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+```
+
+### 5. Requirements File
+
+#### `app/requirements.txt`
+
+```txt
+Flask
+yfinance
+python-dotenv
+```
+
+### 6. Running the Application
+
+#### Docker
+
+To build and run the Docker container:
+
+```bash
+docker build -t stock-dashboard .
+docker run -p 5000:5000 stock-dashboard
+```
+
+#### Kubernetes with Helm
+
+To deploy using Helm on Kubernetes:
+
+```bash
+helm install stock-dashboard ./helm
+```
+
+### Summary
+
+This full example provides a working stock dashboard application using Flask, D3.js, Yahoo Finance API, Docker, and Kubernetes. The application features interactive comparison charts and a metrics table, all designed to be deployed in a containerized environment.

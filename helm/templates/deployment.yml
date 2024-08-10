@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stock-dashboard
+  template:
+    metadata:
+      labels:
+        app: stock-dashboard
+    spec:
+      containers:
+      - name: stock-dashboard
+        image: your-docker-registry/stock-dashboard:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FLASK_ENV
+          value: "production"

@@ -1,4 +1,4 @@
-## Prompts used to generate the code
+## Prompt used to generate the python code on GPT-4o model using OpenAI ChstGPT interface.
 
 Generate python code flask, d3 js, html, css code for stock dashboard application with following features: 
 1. create a comparison chart given a list of comma separated stock symbols, 
@@ -6,4 +6,11 @@ Generate python code flask, d3 js, html, css code for stock dashboard applicatio
 3. Use d3 js, flask, python, yahoo finance api, thin colorful d3 js comparison charts. 
 4. make tooltip on the comparison chart like a bubble and include symbol name and price information in the tooltip bubble.
 5. also when I hover over the line chart or table row, highlight the correspodning stock line in the chart or row in the table
+6. Include the helm chart to run on Kubernetes and Dockerfile also. 
 
+## Prompt used for generating corresponding sql on GPT-4o model using OpenAI ChstGPT interface. 
+
+1. generate the sql for creating comparing 2 stock charts for a given time range. 
+2. Include sample data. 
+3. also, create a user table, create foreign key relationship stock table. 
+4. restrict tyhe query to a particular user only 
