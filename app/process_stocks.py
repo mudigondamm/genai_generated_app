@@ -71,3 +71,52 @@ def process_stock_data(data, min_market_cap=1000000, min_pe_ratio=5, min_price_t
         'valid': valid_stocks,
         'invalid': invalid_stocks
     }
+
+def process_complex_data(data):
+    result = []
+    for item in data:
+        if isinstance(item, dict):
+            if 'type' in item:
+                if item['type'] == 'A':
+                    if 'value' in item:
+                        val = item['value']
+                        if val > 10:
+                            if val < 50:
+                                if 'subtype' in item:
+                                    if item['subtype'] == 'X':
+                                        result.append(val * 2)
+                                    elif item['subtype'] == 'Y':
+                                        result.append(val * 3)
+                                    else:
+                                        result.append(val)
+                                else:
+                                    if val % 2 == 0:
+                                        result.append(val * 4)
+                                    else:
+                                        result.append(val * 5)
+                        else:
+                            if 'subtype' in item and item['subtype'] == 'Z':
+                                result.append(val * 6)
+                            else:
+                                result.append(val * 7)
+                elif item['type'] == 'B':
+                    if 'value' in item:
+                        if item['value'] > 100:
+                            result.append(item['value'] / 2)
+                        else:
+                            if 'modifier' in item:
+                                result.append(item['value'] + item['modifier'])
+                            else:
+                                result.append(item['value'] - 1)
+                else:
+                    result.append(0)
+            else:
+                if 'fallback' in item:
+                    result.append(item['fallback'])
+                else:
+                    result.append(-1)
+        else:
+            result.append(None)
+    return result
+
+
