@@ -21,6 +21,7 @@ Please follow the steps to run on your local machine. Python version used for th
  1. Make sure to install python 3.9. It should work on latest versions of Python as well, but not tested. 
  2. Install dependencies using: pip install -r requirements.txt 
  2. python.exe .\run.py
+ 3. By default, app is configured to be reachable at http://localhost:5000/
 
 
 ## Screenshots
