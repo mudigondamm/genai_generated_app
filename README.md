@@ -8,12 +8,13 @@ purely with LLM prompts with minimal rewrites of the code. For this exercise, I 
 Prompts used for this project can be found in '/LLM prompts' folder. Please note LLMs are probabilistic and somewhat randomness is present in them. Responses may slightly 
 vary for same prompts. 
 
-Tech stack used for this is: Python Flask, D3.js, HTML, CSS, and Javascript. D3.js for visualization gives lot of flexibility for charting. But, with flexibility comes some what complexity in the code. So, I selected D3.js to see how easily I can generate D3.js charts. 
+Tech stack used for this is: Python Flask, Yahoo Finance API, D3.js, HTML, CSS, and Javascript. D3.js for visualization gives lot of flexibility to create complex interactive charts. But, with flexibility comes with some what complexity in the code. So, I selected D3.js to see how easily I can generate D3.js code using LLMs. I didn't request LLM to pick Yahoo finance api. It automatically picked Yahoo finance based on my prompt. 
 
 I was able to generate almost 98% of the code using LLM prompts with very few manual changes. Remaining 2% percent of the time I spent to debug configuration issues, 
 and parsing errors in D3.js code. So, it is not 100% but overall it was very impressive. I didn't have to go to Stackoverflow at all to debug issues. I was able to resolve and get the app running in couple of hours with very few issues. 
 
-This code was developed to accompany my Medium article titled "Use of AI for Enhanced Software Engineering Productivity." You can read the full article here: Use of AI for Enhanced Software Engineering Productivity.
+This code was developed to accompany my medium article titled "Use of AI for Enhanced Software Engineering Productivity." You can read the full article here: https://medium.com/@mudigonda.mm/use-of-ai-for-enhanced-software-engineering-productivity-9d8c96555286.
+
 ## Running the application 
 
 Please follow the steps to run on your local machine. Python version used for the application is 3.9. Best practice is to create a virtual environment. Alos, IDE to go with is Pycharm community version, if you want to give it a try.:
