@@ -14,6 +14,7 @@ I was able to generate almost 98% of the code without any changes. Remaining 2% 
 and parsing errors in D3.js code. So, it is not 100% but very impressive. I didn't have to Strackoverflow at all to debug issues. 
 I was able to resolve and get the app running in couple of hours with minimal issues. 
 
+This code was developed to accompany my Medium article titled "Use of AI for Enhanced Software Engineering Productivity." You can read the full article here: Use of AI for Enhanced Software Engineering Productivity.
 ## Running the application 
 
 Please follow the steps to run on your local machine. Python version used for the application is 3.9. Best practice is to create a virtual environment. Alos, IDE to go with is Pycharm community version, if you want to give it a try.:
@@ -21,10 +22,21 @@ Please follow the steps to run on your local machine. Python version used for th
  1. Make sure to install python 3.9. It should work on latest versions of Python as well, but not tested. 
  2. Install dependencies using: pip install -r requirements.txt 
  2. python.exe .\run.py
- 3. By default, app is configured to be reachable at http://localhost:5000/
+ 3. By default app is configured to be reachable at http://localhost:5000/
 
 
-## Screenshots
+## Application Home Page Screenshot
 
 ![Alt text](app_home_page.png?raw=true "Stock Dashboard App")
 
+## CodeAnt.ai 
+
+For analysing code, I used a another developer tool called CodeAnt.ai. CodeAnt.ai provides analysis, automated fixes and PRs 
+of the code on:
+
+1. Code quality
+2. Application security
+3. Infrastructure security
+4. Potential bugs
+
+To learn more visit: https://www.codeant.ai/. Also, I have written a medium on various AI tools with screenshots: https://medium.com/@mudigonda.mm/use-of-ai-for-enhanced-software-engineering-productivity-9d8c96555286.
