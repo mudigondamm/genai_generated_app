@@ -39,4 +39,4 @@ of the code on:
 3. Infrastructure security
 4. Potential bugs
 
-To learn more visit: https://www.codeant.ai/. Also, I have written a medium on various AI tools with screenshots: https://medium.com/@mudigonda.mm/use-of-ai-for-enhanced-software-engineering-productivity-9d8c96555286.
+To learn more visit: https://www.codeant.ai/. 
