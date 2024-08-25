@@ -1,4 +1,4 @@
-## Prompt used to generate the python code on GPT-4o model using OpenAI ChstGPT interface.
+## Prompts used to generate the python code on GPT-4o, Gemini, and Claude Sonnet models. 
 
 Generate python code flask, d3 js, html, css code for stock dashboard application with following features: 
 1. create a comparison chart given a list of comma separated stock symbols, 
